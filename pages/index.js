@@ -1,15 +1,15 @@
 import Head from 'next/head'
-import HomePage from 'components/page/home.page'
+import IndexPage from 'components/index.page'
 
 export default function Home() {
   return (
     <>
       <Head>
-        <title>پنل خدمات مشتری</title>
-        <meta name="description" content="پنل خدمات مشتری" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.svg" />
       </Head>
 
-      <HomePage />
+      <IndexPage />
     </>
   )
 }
