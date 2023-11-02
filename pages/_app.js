@@ -4,6 +4,7 @@ import createCache from '@emotion/cache'
 import {prefixer} from 'stylis'
 import rtlPlugin from 'stylis-plugin-rtl'
 import CssBaseline from '@mui/material/CssBaseline'
+import MainLayout from 'components/layout/main.layout'
 
 import 'styles/globals.scss'
 
@@ -16,8 +17,10 @@ export default function App({Component, pageProps}) {
   return (
     <MuiThemeProvider>
       <CacheProvider value={cacheRtl}>
-        <CssBaseline />
-        <Component {...pageProps} />
+        <MainLayout>
+          <CssBaseline />
+          <Component {...pageProps} />
+        </MainLayout>
       </CacheProvider>
     </MuiThemeProvider>
   )
