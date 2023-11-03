@@ -5,16 +5,7 @@ import Button from '@mui/material/Button'
 
 export default function CustomerPage() {
   return (
-    <Box
-      sx={{
-        width: 'var(--mobile-width)',
-        maxWidth: 'var(--max-width)',
-        height: '100vh',
-        display: 'grid',
-        placeContent: 'center',
-        mx: 'auto',
-      }}
-    >
+    <Box sx={{pt: '25vh'}}>
       <Box
         sx={{
           textAlign: 'center',

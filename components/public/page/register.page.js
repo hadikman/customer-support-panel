@@ -14,13 +14,12 @@ import FormHelperText from '@mui/material/FormHelperText'
 import Chip from '@mui/material/Chip'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
-import VAZIRMATN_FONT from 'utility/share-font'
 
 export default function RegisterPage() {
   const [isRegisteredForm, setIsRegisteredForm] = React.useState(false)
 
   return (
-    <Box sx={{p: 4}}>
+    <Box>
       {isRegisteredForm ? (
         <Stack
           spacing={4}

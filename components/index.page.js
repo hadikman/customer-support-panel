@@ -12,16 +12,7 @@ export default function IndexPage() {
         <meta name="description" content="پنل خدمات پشتیبانی" />
       </Head>
 
-      <Box
-        sx={{
-          width: 'var(--mobile-width)',
-          maxWidth: 'var(--max-width)',
-          height: '100vh',
-          display: 'grid',
-          placeContent: 'center',
-          mx: 'auto',
-        }}
-      >
+      <Box sx={{pt: '25vh'}}>
         <Box
           sx={{
             textAlign: 'center',
@@ -42,7 +33,7 @@ export default function IndexPage() {
           </Box>
 
           <Button variant="contained">
-            <Link href="/customer/register">ثبت درخواست</Link>
+            <Link href="/customer/register">درخواست پشتیبانی</Link>
           </Button>
         </Box>
       </Box>
