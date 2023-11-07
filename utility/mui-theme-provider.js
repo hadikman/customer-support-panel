@@ -1,17 +1,23 @@
 import {createTheme, ThemeProvider} from '@mui/material/styles'
+import VAZIRMATN_FONT from './share-font'
 
 let theme = createTheme({
   direction: 'rtl',
   typography: {
-    fontFamily: 'inherit',
+    fontFamily: VAZIRMATN_FONT.style.fontFamily,
   },
   components: {
+    MuiModal: {
+      styleOverrides: {
+        root: {
+          fontFamily: VAZIRMATN_FONT.style.fontFamily,
+        },
+      },
+    },
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
-          fontFamily: 'monospace',
-          fontSize: '0.875em',
-          backgroundColor: 'hsl(0 0% 13%)',
+          fontFamily: VAZIRMATN_FONT.style.fontFamily,
         },
       },
     },
