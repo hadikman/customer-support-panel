@@ -29,6 +29,8 @@ export default function MainLayout({children}) {
       sx={{
         width: 'var(--mobile-width)',
         maxWidth: 'var(--max-width)',
+        minHeight: '100dvh',
+        bgcolor: theme => theme.palette.background.default,
         mx: 'auto',
       }}
     >

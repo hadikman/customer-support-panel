@@ -1,4 +1,5 @@
 import {createTheme, ThemeProvider} from '@mui/material/styles'
+import {faIR} from '@mui/material/locale'
 import VAZIRMATN_FONT from './share-font'
 
 let theme = createTheme({
@@ -7,6 +8,13 @@ let theme = createTheme({
     fontFamily: VAZIRMATN_FONT.style.fontFamily,
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: theme => ({
+        body: {
+          backgroundColor: theme.palette.grey[700],
+        },
+      }),
+    },
     MuiModal: {
       styleOverrides: {
         root: {
@@ -22,6 +30,7 @@ let theme = createTheme({
       },
     },
   },
+  faIR,
 })
 
 export default function MuiThemeProvider({children, ...props}) {
