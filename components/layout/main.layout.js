@@ -2,6 +2,7 @@ import * as React from 'react'
 import {useRouter} from 'next/router'
 import PanelMainLayout from 'components/panel/layout/main.layout'
 import PublicMainLayout from 'components/public/layout/main.layout'
+import PanelAuthentication from 'components/panel/auth/auth'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import VAZIRMATN_FONT from 'utility/share-font'
@@ -35,7 +36,9 @@ export default function MainLayout({children}) {
       }}
     >
       {isPanel ? (
-        <PanelMainLayout>{children}</PanelMainLayout>
+        <PanelAuthentication>
+          <PanelMainLayout>{children}</PanelMainLayout>
+        </PanelAuthentication>
       ) : isPublic ? (
         <PublicMainLayout>{children}</PublicMainLayout>
       ) : (
