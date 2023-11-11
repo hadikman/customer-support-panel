@@ -1,5 +1,11 @@
+import Header from './header.layout'
 import Box from '@mui/material/Box'
 
 export default function PanelMainLayout({children}) {
-  return <Box>{children}</Box>
+  return (
+    <>
+      <Header />
+      <Box component="main">{children}</Box>
+    </>
+  )
 }
