@@ -1,0 +1,26 @@
+const icons = {
+  search: 'magnifying-glass',
+  inbox: 'inbox',
+  moreVer: 'ellipsis-vertical',
+  menu: 'bars',
+  login: 'arrow-right-to-bracket',
+  logout: 'arrow-right-from-bracket',
+  home: 'home',
+  shieldKeyhole: 'shield-keyhole',
+  waiting: 'square-exclamation',
+  completion: 'square-check',
+  progress: 'screwdriver-wrench',
+  erase: 'trash-can',
+  chevronUp: 'chevron-up',
+  chevronDown: 'chevron-down',
+  chevronLeft: 'chevron-left',
+  chevronRight: 'chevron-right',
+  caretUp: 'caret-up',
+  caretDown: 'caret-down',
+  caretLeft: 'caret-left',
+  caretRight: 'caret-right',
+  firstPage: 'arrow-right-to-line',
+  lastPage: 'arrow-left-to-line',
+}
+
+export default icons
