@@ -226,7 +226,7 @@ export default function Header() {
           <Box sx={{flexGrow: 1}} />
           <Box sx={{display: {xs: 'none', md: 'flex'}}}>
             <IconButton size="large">
-              <Badge badgeContent={4} color="error">
+              <Badge badgeContent={isSuccess ? data.data : '-'} color="error">
                 <Icon name={inbox} size="small" color="#fff" />
               </Badge>
             </IconButton>

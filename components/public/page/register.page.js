@@ -283,7 +283,7 @@ function SupportRequestForm({onSubmittedForm, submittedFormData}) {
           type="submit"
           variant="contained"
           size="large"
-          disabled={(isPending, isSuccess)}
+          disabled={isPending || isSuccess}
           sx={{mt: 3}}
         >
           {isPending ? (
