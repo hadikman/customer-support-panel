@@ -1,5 +1,6 @@
 import * as React from 'react'
 import Link from 'next/link'
+import useMutateData from 'hook/useMutateData'
 import {useTheme} from '@mui/material/styles'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
@@ -14,9 +15,13 @@ import FormHelperText from '@mui/material/FormHelperText'
 import Chip from '@mui/material/Chip'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
+import CircularProgress from '@mui/material/CircularProgress'
+import CustomizedTextField from 'components/UI/customized-text-field'
+import {ADD_REGISTER_REQUEST_API_URL} from 'library/api-url'
 
 export default function RegisterPage() {
   const [isRegisteredForm, setIsRegisteredForm] = React.useState(false)
+  const [submittedFormData, setSubmittedFormData] = React.useState({})
 
   return (
     <Box>
@@ -38,8 +43,12 @@ export default function RegisterPage() {
             فرم درخواست پشتیبانی با موفقیت ثبت گردید
           </Typography>
           <Typography>
-            توجه فرمایید طی یک الی دو روز آینده شماره تلفن همراه شما در دسترس
-            باشد تا در فرآیند رسیدگی به درخواست شما وقفه‌ای ایجاد نگردد.
+            {submittedFormData.name} عزیز، درخواست شما ثبت گردید
+          </Typography>
+          <Typography>
+            توجه فرمایید طی یک الی دو روز آینده شماره تلفن همراه
+            <b>{` 0${submittedFormData.mobileNumber}`}</b> در دسترس باشد تا در
+            فرآیند رسیدگی به درخواست شما وقفه‌ای ایجاد نگردد.
           </Typography>
 
           <Button variant="contained">
@@ -47,7 +56,10 @@ export default function RegisterPage() {
           </Button>
         </Stack>
       ) : (
-        <SupportRequestForm onSubmittedFrom={setIsRegisteredForm} />
+        <SupportRequestForm
+          onSubmittedForm={setIsRegisteredForm}
+          submittedFormData={setSubmittedFormData}
+        />
       )}
     </Box>
   )
@@ -82,8 +94,17 @@ function getStyles(name, personName, theme) {
   }
 }
 
-function SupportRequestForm({onSubmittedFrom}) {
+function SupportRequestForm({onSubmittedForm, submittedFormData}) {
+  const {
+    mutate: mutateToAddRequest,
+    data,
+    isPending,
+    isSuccess,
+  } = useMutateData({
+    url: ADD_REGISTER_REQUEST_API_URL,
+  })
   const theme = useTheme()
+
   const [name, setName] = React.useState('')
   const [mobileNumber, setMobileNumber] = React.useState('')
   const [phoneNumber, setPhoneNumber] = React.useState('')
@@ -91,17 +112,12 @@ function SupportRequestForm({onSubmittedFrom}) {
   const [selectServices, setSelectServices] = React.useState([])
   const [description, setDescription] = React.useState('')
 
-  function handleOnChangeName(e) {
-    setName(e.target.value)
-  }
-
-  function handleOnChangeMobileNumber(e) {
-    setMobileNumber(e.target.value)
-  }
-
-  function handleOnChangePhoneNumber(e) {
-    setPhoneNumber(e.target.value)
-  }
+  React.useEffect(() => {
+    if (isSuccess) {
+      submittedFormData(data.data)
+      onSubmittedForm(true)
+    }
+  }, [data, isSuccess, onSubmittedForm, submittedFormData])
 
   function handleOnChangeAddress(e) {
     setAddress(e.target.value)
@@ -117,19 +133,19 @@ function SupportRequestForm({onSubmittedFrom}) {
     setDescription(e.target.value)
   }
 
-  function handleOnSubmitForm() {
+  function handleOnSubmitForm(e) {
+    e.preventDefault()
+
     const formData = {
-      name: name.trim(),
-      mobileNumber: mobileNumber.trim(),
-      phoneNumber: phoneNumber.trim(),
+      name: name,
+      mobileNumber: +mobileNumber,
+      phoneNumber: +phoneNumber,
       address: address.trim(),
       selectServices,
       description: description.trim(),
     }
-    // TODO send a POST req to the API
-    console.log(formData)
 
-    onSubmittedFrom(true)
+    mutateToAddRequest(formData)
   }
 
   return (
@@ -150,12 +166,15 @@ function SupportRequestForm({onSubmittedFrom}) {
         <Divider light sx={{borderWidth: 2, borderStyle: 'dashed'}} />
 
         <Typography textAlign="justify">
-          با استفاده از این فرم می‌توانید درخواست خود را برای دریافت خدمات
+          ● با استفاده از این فرم می‌توانید درخواست خود را برای دریافت خدمات
           پشتیبانی ثبت نمایید.
         </Typography>
         <Typography textAlign="justify">
-          پس از دریافت درخواست طی یک الی دو روز کاری جهت حضور در آدرس ثبت شده با
-          شما تماس گرفته شده و هماهنگی‌های لازم انجام خواهد شد.
+          ● پس از دریافت درخواست طی یک الی دو روز کاری جهت حضور در آدرس ثبت شده
+          با شما تماس گرفته شده و هماهنگی‌های لازم انجام خواهد شد.
+        </Typography>
+        <Typography textAlign="justify">
+          ● وارد کردن مقادیر برای ردیف ستاره‌دار الزامی است.
         </Typography>
       </Stack>
 
@@ -164,42 +183,46 @@ function SupportRequestForm({onSubmittedFrom}) {
         sx={{
           gap: 1,
           '.fix-height': {
-            height: 80,
+            minHeight: 80,
           },
         }}
         onSubmit={handleOnSubmitForm}
       >
-        <TextField
+        <CustomizedTextField
           id="name"
           className="fix-height"
           label="نام خانوادگی"
           placeholder="آقای/خانم رضایی"
-          value={name}
-          helperText="رزرو"
+          errorMessage="فقط حروف فارسی/انگلیسی مجاز است."
           fullWidth
           required
-          onChange={handleOnChangeName}
+          autoFocus
+          regex={/^[a-zA-Z\u0600-\u06FF\s]+$/}
+          length="35"
+          onReturnValue={setName}
         />
-        <TextField
+        <CustomizedTextField
           id="mobile-number"
           className="fix-height"
           label="شماره موبایل"
           placeholder="09387069917"
-          value={mobileNumber}
-          helperText="رزرو"
-          fullWidth
           required
-          onChange={handleOnChangeMobileNumber}
+          regex={/^0[0-9]*$/}
+          length="11"
+          errorMessage="فقط اعداد مجاز است و شماره باید با صفر شروع شود"
+          fullWidth
+          onReturnValue={setMobileNumber}
         />
-        <TextField
+        <CustomizedTextField
           id="phone-number"
           className="fix-height"
           label="شماره ثابت"
-          placeholder="22113847"
-          value={phoneNumber}
-          helperText="رزرو"
+          placeholder="66743198"
+          regex={/^[0-9]*$/}
+          length="8"
+          errorMessage="فقط اعداد مجاز است و شماره باید بدون کد شهر وارد شود"
           fullWidth
-          onChange={handleOnChangePhoneNumber}
+          onReturnValue={setPhoneNumber}
         />
         <TextField
           id="address"
@@ -233,7 +256,6 @@ function SupportRequestForm({onSubmittedFrom}) {
             )}
             MenuProps={MenuProps}
           >
-            <MenuItem disabled>بیش از یک مورد می‌توانید انتخاب کنید</MenuItem>
             {services.map(name => (
               <MenuItem
                 key={name}
@@ -244,7 +266,7 @@ function SupportRequestForm({onSubmittedFrom}) {
               </MenuItem>
             ))}
           </Select>
-          <FormHelperText>رزرو</FormHelperText>
+          <FormHelperText>بیش از یک گزینه می‌توانید انتخاب کنید</FormHelperText>
         </FormControl>
         <TextField
           id="description"
@@ -257,8 +279,22 @@ function SupportRequestForm({onSubmittedFrom}) {
           onChange={handleOnChangeDescription}
         />
 
-        <Button type="submit" variant="contained" size="large" sx={{mt: 3}}>
-          ثبت درخواست
+        <Button
+          type="submit"
+          variant="contained"
+          size="large"
+          disabled={(isPending, isSuccess)}
+          sx={{mt: 3}}
+        >
+          {isPending ? (
+            <>
+              {'در حال ارسال'} <CircularProgress size={15} sx={{mx: 1}} />
+            </>
+          ) : isSuccess ? (
+            'با موفقیت ثبت شد'
+          ) : (
+            'ثبت درخواست'
+          )}
         </Button>
       </Stack>
     </Stack>

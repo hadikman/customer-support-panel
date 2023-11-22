@@ -1,7 +1,6 @@
 import * as React from 'react'
 import {AuthContext} from './auth'
-// import axiosClient from 'util/axios-http'
-// import {LOGIN_API} from 'util/api-url'
+import useMutateData from 'hook/useMutateData'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
@@ -12,44 +11,43 @@ import Snackbar from '@mui/material/Snackbar'
 import {keyframes} from '@mui/material'
 import Icon from 'components/UI/icon'
 import icons from 'library/icons-name'
+import {AUTH_API_URL} from 'library/api-url'
 
 const {shieldKeyhole} = icons
-// const DISPLAY_LOADING_PANEL = 1750
 
 const bblFadInOut = keyframes({
   '0%, 80%, 100%': {boxShadow: '0 2.5em 0 -1.3em'},
   '40%': {boxShadow: '0 2.5em 0 0 '},
 })
 
-// async function fetchLoginData(userData) {
-//   let response
-
-//   try {
-//     response = await axiosClient.post(LOGIN_API, userData)
-//     response = response.data
-//   } catch (error) {
-//     response = error
-
-//     if (response.status !== 200) {
-//       console.error(`Error code: ${error.response.status}`)
-//     }
-//   }
-
-//   return response
-// }
-
 export default function SignIn() {
+  const {mutate, data, isPending, isSuccess} = useMutateData({
+    url: AUTH_API_URL,
+    queryKey: [''],
+  })
   const {onUpdateAuthState} = React.useContext(AuthContext)
-  const [isLoadingPanel, setIsLoadingPanel] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState('')
 
   const isError = errorMessage !== ''
 
-  const handleOnSubmitForm = async event => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
+  React.useEffect(() => {
+    if (isSuccess) {
+      if (data.success) {
+        localStorage.setItem(
+          'customer-support-panel-token',
+          JSON.stringify(data.data),
+        )
+        onUpdateAuthState(true)
+      } else {
+        setErrorMessage('نام کاربری/رمز عبور اشتباه است')
+      }
+    }
+  }, [isSuccess, data, onUpdateAuthState])
 
-    setIsLoadingPanel(true)
+  function handleOnSubmitForm(event) {
+    event.preventDefault()
+
+    const formData = new FormData(event.currentTarget)
 
     if (isError) {
       setErrorMessage('')
@@ -60,26 +58,7 @@ export default function SignIn() {
       password: formData.get('password').trim(),
     }
 
-    onUpdateAuthState(true)
-    // const data = await fetchLoginData(userData)
-
-    // if (data.success) {
-    //   let timeout
-
-    //   localStorage.setItem('token', JSON.stringify(data.data.token))
-
-    //   timeout = setTimeout(() => {
-    //     onUpdateAuthState(true)
-    //     setIsLoadingPanel(false)
-    //     clearTimeout(timeout)
-    //   }, DISPLAY_LOADING_PANEL)
-    // } else if (data.response.status === 403) {
-    //   setErrorMessage('نام کاربری/رمز عبور اشتباه است')
-    //   setIsLoadingPanel(false)
-    // } else if (data.response.status >= 500) {
-    //   setErrorMessage('عدم دسترسی به سرور')
-    //   setIsLoadingPanel(false)
-    // }
+    mutate(userData)
   }
 
   return (
@@ -141,7 +120,7 @@ export default function SignIn() {
               sx={{
                 bgcolor: 'error.light',
                 color: 'error.contrastText',
-                borderRadius: 'var(--sm-corner)',
+                borderRadius: 1,
                 p: 1,
               }}
             >
@@ -150,7 +129,7 @@ export default function SignIn() {
           </Snackbar>
         )}
 
-        {isLoadingPanel ? (
+        {isPending ? (
           <Box
             sx={{
               position: 'fixed',

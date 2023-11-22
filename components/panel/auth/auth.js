@@ -12,33 +12,32 @@ export const AuthContext = React.createContext({
 })
 
 export default function Authentication({children, ...props}) {
-  const [isAuthenticated, setIsAuthenticated] = React.useState(true)
-  const [isLoading, setIsLoading] = React.useState(true)
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false)
+  const [isLoadingPanel, setIsLoadingPanel] = React.useState(true)
 
   React.useEffect(() => {
-    const isToken = JSON.parse(localStorage.getItem('token')) !== null
+    const isToken =
+      JSON.parse(localStorage.getItem('customer-support-panel-token')) !== null
+    setIsLoadingPanel(false)
 
     if (isToken) {
       setIsAuthenticated(true)
     }
-
-    setIsLoading(false)
   }, [])
 
   const value = {isAuth: isAuthenticated, onUpdateAuthState: setIsAuthenticated}
 
   return (
     <AuthContext.Provider value={value}>
-      {isLoading ? (
+      {isLoadingPanel ? (
         <Box
           sx={{
-            width: '100%',
-            height: '100dvh',
+            height: '100svh',
             display: 'grid',
             placeContent: 'center',
           }}
         >
-          <CircularProgress size={50} />
+          <CircularProgress size={60} />
         </Box>
       ) : isAuthenticated ? (
         <>{children}</>
@@ -52,17 +51,18 @@ export default function Authentication({children, ...props}) {
 function AuthenticationPage({...props}) {
   const [value, setValue] = React.useState(0)
 
-  function handleChangeTabs(event, newValue) {
+  function handleOnChangeTabs(event, newValue) {
     setValue(newValue)
   }
 
   return (
     <Box
       sx={{
-        height: '100vh',
+        minHeight: '100svh',
         backgroundImage: 'radial-gradient(#444cf7 0.5px, hsl(0 0% 85%) 0.5px)',
         backgroundSize: '10px 10px',
-        pt: 6,
+        pt: 10,
+        position: 'relative',
       }}
     >
       <Stack
@@ -81,7 +81,7 @@ function AuthenticationPage({...props}) {
         {...props}
       >
         <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
-          <Tabs value={value} onChange={handleChangeTabs}>
+          <Tabs value={value} onChange={handleOnChangeTabs}>
             <Tab label="ورود کاربر" />
           </Tabs>
         </Box>
@@ -95,7 +95,7 @@ function AuthenticationPage({...props}) {
 
 function CustomTabPanel({children, value, index, ...other}) {
   return (
-    <Box hidden={value !== index} id={`simple-tabpanel-${index}`} {...other}>
+    <Box hidden={value !== index} id={`tabpanel-${index}`} {...other}>
       {value === index && <Box sx={{p: 2}}>{children}</Box>}
     </Box>
   )

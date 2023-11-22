@@ -1,7 +1,8 @@
 import * as React from 'react'
-import {Calendar, utils} from '@hassanmojab/react-modern-calendar-datepicker'
+import useQueryData from 'hook/useQueryData'
+import useMutateData from 'hook/useMutateData'
+import Link from 'next/link'
 import Grid from '@mui/material/Grid'
-import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import TableContainer from '@mui/material/TableContainer'
@@ -12,35 +13,23 @@ import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 import TableFooter from '@mui/material/TableFooter'
 import TablePagination from '@mui/material/TablePagination'
-import Modal from '@mui/material/Modal'
 import Typography from '@mui/material/Typography'
-import TextField from '@mui/material/TextField'
-import ButtonGroup from '@mui/material/ButtonGroup'
 import IconButton from '@mui/material/IconButton'
-import Button from '@mui/material/Button'
-import Fade from '@mui/material/Fade'
-import Chip from '@mui/material/Chip'
-import Divider from '@mui/material/Divider'
 import Icon from 'components/UI/icon'
-import DUMMY_DATA from 'library/dummy-data'
+import StyledHeadCell from 'components/panel/UI/styled-head-cell'
+import StyledCell from 'components/panel/UI/styled-cell'
+import Notification from 'components/UI/notification'
 import icons from 'library/icons-name'
-import {customVerticalScrollbar} from 'utility/scrollbar-group'
+import {
+  GET_ALL_FORMS_API_URL,
+  DELETE_REQUEST_API_URL,
+  UPDATE_REQUEST_API_URL,
+} from 'library/api-url'
 
 import '@hassanmojab/react-modern-calendar-datepicker/lib/DatePicker.css'
 
 const DISPLAY_ROWS = 8
-const aliasNames = {
-  id: 'شماره',
-  name: 'نام خانوادگی',
-  address: 'آدرس',
-  mobileNumber: 'شماره موبایل',
-  phoneNumber: 'شماره ثابت',
-  services: 'خدمات',
-  description: 'توضیحات',
-  descOfServicesPerformed: 'سرویس‌های انجام شده',
-  dateOfService: 'تاریخ بازدید',
-  serviceState: 'وضعیت رسیدگی',
-}
+const ROW_HEIGHT = 60.8
 const {
   progress,
   completion,
@@ -50,73 +39,64 @@ const {
   firstPage,
   lastPage,
 } = icons
-const todayData = utils('fa').getToday()
 
 export default function DashCPPage() {
-  const [openModal, setOpenModal] = React.useState(false)
-  const [requestData, setRequestData] = React.useState([])
-  const [serviceState, setServiceState] = React.useState('')
-  const [examinationDesc, setExaminationDesc] = React.useState('')
-  const [selectedExaminationDate, setSelectedExaminationDate] =
-    React.useState('')
+  const {data, isLoading, isSuccess} = useQueryData({
+    queryKey: ['all-forms'],
+    url: GET_ALL_FORMS_API_URL,
+    refetchInterval: 300000,
+  })
+  const {
+    mutate: mutateToDeleteRequest,
+    isPending: isPendingDeletion,
+    isSuccess: isDeletedSuccessfully,
+  } = useMutateData({
+    url: DELETE_REQUEST_API_URL,
+    queryKey: ['all-forms'],
+  })
+  const {mutate: mutateToUpdateRequest, isSuccess: isUpdatedSuccessfully} =
+    useMutateData({
+      url: UPDATE_REQUEST_API_URL,
+      queryKey: ['all-forms'],
+    })
+
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(DISPLAY_ROWS)
+  const [status, setStatus] = React.useState('')
+  let emptyRowsInLastPage
 
-  const isShowSingleRequest = requestData.length !== 0
-  const isServiceInProgress = serviceState === 'در حال رسیدگی'
-  const isCompletedService = serviceState === 'انجام شده'
-  const isEmptyService = !isServiceInProgress && !isCompletedService
-  const isEmptyExaminationDesc = examinationDesc === ''
-  const isEmptySelectedExaminationDate = selectedExaminationDate === ''
-  const isEmptyExaminationForm =
-    isEmptyExaminationDesc && isEmptySelectedExaminationDate && isEmptyService
+  const isPendingRequestDeletion = status === 'pending'
+  const isDeletedRequest = status === 'deleted'
+  const isOpenNotification = isDeletedRequest || isPendingRequestDeletion
+  const isSuccessfulNotification = isOpenNotification
 
-  const emptyRowsInLastPage =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - DUMMY_DATA.length) : 0
+  const statusMsg = isPendingRequestDeletion
+    ? 'در حال حذف درخواست پشتیبانی'
+    : isDeletedRequest
+    ? 'درخواست پشتیبانی با موفقیت حذف شد'
+    : ''
 
-  function handleOnDeleteRequest(id) {
-    // TODO send a POST request to the API - /deleteRequest {requestID: id}
+  if (isSuccess) {
+    emptyRowsInLastPage =
+      page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0
   }
 
-  function handleOnOpenModal(id) {
-    let newStructuredRequestData = []
-
-    const foundObj = DUMMY_DATA.find(request => request.id === id)
-    for (let [key, value] of Object.entries(foundObj)) {
-      const aliasName = aliasNames[key]
-      const isAliasName = aliasName
-      const isValue = Boolean(value)
-
-      if (isAliasName) {
-        newStructuredRequestData.push({
-          title: aliasName,
-          content: isValue ? value : '—',
-        })
-      }
+  React.useEffect(() => {
+    if (isPendingDeletion) {
+      setStatus('pending')
     }
 
-    setOpenModal(true)
-    setRequestData(newStructuredRequestData)
+    if (isDeletedSuccessfully) {
+      setStatus('deleted')
+    }
+  }, [isPendingDeletion, isDeletedSuccessfully, isUpdatedSuccessfully])
 
-    // TODO send a POST request to the API - /seenRequest {requestID: id, seen: true}
+  function handleOnDeleteRequest(id) {
+    mutateToDeleteRequest({requestId: id})
   }
 
-  function handleOnCloseModal() {
-    setOpenModal(false)
-    setSelectedExaminationDate('')
-    setExaminationDesc('')
-  }
-
-  function handleOnServiceState(state) {
-    setServiceState(prevState => (state === prevState ? '' : state))
-  }
-
-  function handleOnChangeDescription(e) {
-    setExaminationDesc(e.target.value)
-  }
-
-  function handleOnClickGoToToday() {
-    setSelectedExaminationDate(todayData)
+  function handleOnClickCell(id) {
+    mutateToUpdateRequest({requestId: id, seen: true})
   }
 
   function handleOnChangePage(event, newPage) {
@@ -128,20 +108,6 @@ export default function DashCPPage() {
     setPage(0)
   }
 
-  function handleOnSubmitExaminationForm(e) {
-    e.preventDefault()
-    const {day, month, year} = selectedExaminationDate
-
-    const formData = {
-      id: requestData[0].content,
-      descOfServicesPerformed: examinationDesc,
-      dateOfService: `${year}/${month}/${day}`,
-      serviceState,
-    }
-
-    // TODO send a POST req to the API - /registerExaminationRequest formData
-  }
-
   return (
     <Box sx={{p: 2}}>
       <TableContainer component={Paper} sx={{width: '100%'}}>
@@ -150,305 +116,176 @@ export default function DashCPPage() {
             <TableRow>
               <StyledHeadCell>ردیف</StyledHeadCell>
               <StyledHeadCell>نام</StyledHeadCell>
+              <StyledHeadCell>تاریخ ثبت</StyledHeadCell>
               <StyledHeadCell>وضعیت</StyledHeadCell>
             </TableRow>
           </TableHead>
 
-          <TableBody>
-            {(rowsPerPage > 0
-              ? DUMMY_DATA.slice(
-                  page * rowsPerPage,
-                  page * rowsPerPage + rowsPerPage,
-                )
-              : DUMMY_DATA
-            ).map(({id, name, serviceState, seen}, idx) => (
-              <TableRow
-                key={id}
-                sx={{
-                  '&:nth-of-type(odd)': {
-                    backgroundColor: theme => theme.palette.action.hover,
-                  },
-                  '&:last-child td, &:last-child th': {border: 0},
-                }}
-              >
-                <TableCell>{DISPLAY_ROWS * page + idx + 1}</TableCell>
-                <TableCell
-                  component="th"
-                  scope="row"
-                  onClick={() => handleOnOpenModal(id)}
-                  sx={{cursor: 'pointer', position: 'relative'}}
-                >
-                  {seen && (
-                    <Box
-                      component="span"
-                      sx={{
+          {isLoading ? (
+            <TableBody>
+              <TableRow sx={{height: ROW_HEIGHT * rowsPerPage}}>
+                <TableCell colSpan={4} sx={{fontSize: 20, textAlign: 'center'}}>
+                  در حال بارگزاری جدول...
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          ) : isSuccess ? (
+            <>
+              <TableBody>
+                {(rowsPerPage > 0
+                  ? data.slice(
+                      page * rowsPerPage,
+                      page * rowsPerPage + rowsPerPage,
+                    )
+                  : data
+                ).map(({_id, name, registerDate, serviceState, seen}, idx) => (
+                  <TableRow
+                    key={_id}
+                    sx={{
+                      '&:nth-of-type(odd)': {
+                        backgroundColor: theme => theme.palette.action.hover,
+                      },
+                      '&:last-child td, &:last-child th': {
+                        border: 0,
+                      },
+                      '.link': {
                         position: 'absolute',
-                        top: -8,
-                        left: -8,
-                        width: 8,
-                        height: 8,
-                        border: '8px solid transparent',
-                        borderBottomColor: 'error.main',
-                        transform: 'rotate(45deg)',
-                      }}
-                    ></Box>
-                  )}
-                  {name}
-                </TableCell>
-                <TableCell>
-                  <Grid container sx={{alignItems: 'center', gap: 1}}>
-                    {serviceState === 'در حال رسیدگی' ? (
-                      <Icon name={progress} color="warning" size="small" />
-                    ) : serviceState === 'انجام شده' ? (
-                      <Icon name={completion} color="success" size="small" />
-                    ) : (
-                      <Icon name={progress} color="grey-4" size="small" />
-                    )}
-                    <IconButton
-                      size="small"
-                      onClick={() => handleOnDeleteRequest(id)}
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                      },
+                    }}
+                  >
+                    <StyledCell align="center">
+                      {DISPLAY_ROWS * page + idx + 1}
+                    </StyledCell>
+                    <StyledCell
+                      sx={{px: 0, cursor: 'pointer', position: 'relative'}}
+                      onClick={() => handleOnClickCell(_id)}
                     >
-                      <Icon name={erase} color="error" size="small" />
-                    </IconButton>
-                  </Grid>
-                </TableCell>
-              </TableRow>
-            ))}
-            {emptyRowsInLastPage > 0 && (
-              <TableRow style={{height: 60.8 * emptyRowsInLastPage}}>
-                <TableCell colSpan={6} />
-              </TableRow>
-            )}
-          </TableBody>
+                      {!seen && (
+                        <Box
+                          component="span"
+                          sx={{
+                            position: 'absolute',
+                            top: -6,
+                            left: -6,
+                            width: 6,
+                            height: 6,
+                            border: '6px solid transparent',
+                            borderBottomColor: 'error.main',
+                            transform: 'rotate(45deg)',
+                          }}
+                        ></Box>
+                      )}
+                      <Link
+                        href={`/dash-cp/request?q=${_id}`}
+                        className="link"
+                      ></Link>
+                      {name}
+                    </StyledCell>
+                    <StyledCell align="center">
+                      {registerDate.split('-')[1].slice(6)}
+                    </StyledCell>
+                    <StyledCell>
+                      <Grid
+                        container
+                        sx={{
+                          alignItems: 'center',
+                          justifyContent: 'space-evenly',
+                          gap: 0.5,
+                        }}
+                      >
+                        {serviceState === 'در حال رسیدگی' ? (
+                          <Icon name={progress} color="warning" size="small" />
+                        ) : serviceState === 'انجام شده' ? (
+                          <Icon
+                            name={completion}
+                            color="success"
+                            size="small"
+                          />
+                        ) : (
+                          <Icon name={progress} color="grey-4" size="small" />
+                        )}
+                        <IconButton
+                          size="small"
+                          onClick={() => handleOnDeleteRequest(_id)}
+                        >
+                          <Icon name={erase} color="error" size="small" />
+                        </IconButton>
+                      </Grid>
+                    </StyledCell>
+                  </TableRow>
+                ))}
+                {emptyRowsInLastPage > 0 && (
+                  <TableRow sx={{height: ROW_HEIGHT * emptyRowsInLastPage}}>
+                    <StyledCell colSpan={4} />
+                  </TableRow>
+                )}
+              </TableBody>
 
-          <TableFooter sx={{px: 1}}>
-            <TableRow>
-              <TablePagination
-                rowsPerPageOptions={[
-                  DISPLAY_ROWS,
-                  DISPLAY_ROWS + 5,
-                  DISPLAY_ROWS + 5 + 5,
-                ]}
-                colSpan={3}
-                count={DUMMY_DATA.length}
-                rowsPerPage={rowsPerPage}
-                labelRowsPerPage="تعداد"
-                labelDisplayedRows={({from, to, count}) =>
-                  `${from}-${to} از ${count}`
-                }
-                page={page}
-                onPageChange={handleOnChangePage}
-                onRowsPerPageChange={handleOnChangeRowsPerPage}
-                ActionsComponent={TablePaginationActions}
+              <TableFooter
                 sx={{
-                  '& .MuiTablePagination-toolbar': {
+                  px: 1,
+                  '.toolbar': {
                     flexDirection: 'row-reverse',
                   },
-                  '& .MuiTablePagination-selectLabel': {
+                  '.selectLabel': {
                     order: -1,
                     ml: 2,
                   },
-                  '& .MuiTablePagination-input': {
+                  '.input': {
                     order: -2,
                     mr: 1,
                   },
-                  '& .MuiTablePagination-displayedRows': {
+                  '.displayedRows': {
                     ml: 1,
                     mr: 1,
                   },
                 }}
-              />
-            </TableRow>
-          </TableFooter>
+              >
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={[
+                      DISPLAY_ROWS,
+                      DISPLAY_ROWS + 5,
+                      DISPLAY_ROWS + 5 + 5,
+                    ]}
+                    colSpan={4}
+                    count={data.length}
+                    rowsPerPage={rowsPerPage}
+                    labelRowsPerPage="تعداد"
+                    labelDisplayedRows={({from, to, count}) =>
+                      `${from}-${to} از ${count}`
+                    }
+                    page={page}
+                    onPageChange={handleOnChangePage}
+                    onRowsPerPageChange={handleOnChangeRowsPerPage}
+                    ActionsComponent={TablePaginationActions}
+                    classes={{
+                      toolbar: 'toolbar',
+                      selectLabel: 'selectLabel',
+                      input: 'input',
+                      displayedRows: 'displayedRows',
+                    }}
+                  />
+                </TableRow>
+              </TableFooter>
+            </>
+          ) : (
+            <Typography variant="h3">عدم اتصال به سرور</Typography>
+          )}
         </Table>
       </TableContainer>
 
-      {isShowSingleRequest && (
-        <Modal open={openModal} onClose={handleOnCloseModal} sx={{p: 2}}>
-          <Fade in={openModal}>
-            <Box
-              sx={{
-                backgroundColor: theme => theme.palette.common.white,
-                color: theme => theme.palette.common.black,
-                borderRadius: theme => theme.shape.borderRadius,
-                p: 2,
-              }}
-            >
-              <Box
-                sx={{
-                  maxHeight: '84vh',
-                  p: 1,
-                  overflowY: 'auto',
-                  ...customVerticalScrollbar,
-                }}
-              >
-                <TableContainer component={Paper} sx={{width: '100%', mb: 2}}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <StyledHeadCell>عنوان</StyledHeadCell>
-                        <StyledHeadCell>شرح</StyledHeadCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {requestData.map(({title, content}, idx) => {
-                        const isArrayContent = Array.isArray(content)
-
-                        return (
-                          <TableRow
-                            key={idx}
-                            sx={{
-                              '&:nth-of-type(odd)': {
-                                backgroundColor: theme =>
-                                  theme.palette.action.hover,
-                              },
-                              '&:last-child td, &:last-child th': {border: 0},
-                            }}
-                          >
-                            <TableCell>{title}</TableCell>
-                            {isArrayContent ? (
-                              <TableCell>
-                                <Stack
-                                  sx={{
-                                    flexDirection: 'row',
-                                    flexWrap: 'wrap',
-                                    gap: 1,
-                                  }}
-                                >
-                                  {content.map(val => (
-                                    <Chip
-                                      key={val}
-                                      label={val}
-                                      color="primary"
-                                    />
-                                  ))}
-                                </Stack>
-                              </TableCell>
-                            ) : (
-                              <TableCell>{content}</TableCell>
-                            )}
-                          </TableRow>
-                        )
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-
-                <Divider
-                  sx={{borderWidth: 1.5, borderStyle: 'dotted', mb: 2}}
-                />
-
-                <Stack
-                  component="form"
-                  sx={{gap: 2}}
-                  onSubmit={handleOnSubmitExaminationForm}
-                >
-                  <Typography>ثبت وضعیت رسیدگی</Typography>
-                  <ButtonGroup>
-                    <Button
-                      variant={isServiceInProgress ? 'contained' : 'outlined'}
-                      color="warning"
-                      onClick={() => handleOnServiceState('در حال رسیدگی')}
-                    >
-                      در حال رسیدگی
-                    </Button>
-                    <Button
-                      variant={isCompletedService ? 'contained' : 'outlined'}
-                      color="success"
-                      onClick={() => handleOnServiceState('انجام شده')}
-                    >
-                      انجام شده
-                    </Button>
-                  </ButtonGroup>
-
-                  <TextField
-                    id="examination-description"
-                    label="شرح بازدید"
-                    value={examinationDesc}
-                    multiline
-                    rows={6}
-                    fullWidth
-                    onChange={handleOnChangeDescription}
-                  />
-                  <Typography>ثبت تاریخ بازدید</Typography>
-                  <Box
-                    sx={{
-                      mx: 'auto',
-                      '.calendar-size': {
-                        fontSize: 9,
-                      },
-                      '.today': {
-                        border: '1.5px solid',
-                        borderColor: 'success.light',
-                      },
-                    }}
-                  >
-                    <Calendar
-                      calendarClassName="calendar-size"
-                      calendarTodayClassName="today"
-                      value={selectedExaminationDate}
-                      onChange={setSelectedExaminationDate}
-                      shouldHighlightWeekends
-                      locale="fa"
-                      renderFooter={() => (
-                        <Box
-                          sx={{
-                            bgcolor: theme => theme.palette.warning.light,
-                            borderBottomRightRadius: 4,
-                            borderBottomLeftRadius: 4,
-                            p: 1,
-                          }}
-                        >
-                          <Button
-                            variant="contained"
-                            size="small"
-                            onClick={handleOnClickGoToToday}
-                          >
-                            امروز
-                          </Button>
-                        </Box>
-                      )}
-                    />
-                  </Box>
-
-                  <Stack sx={{flexDirection: 'row', gap: 2}}>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      disabled={isEmptyExaminationForm}
-                      sx={{flexGrow: 1}}
-                    >
-                      ثبت بازدید
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      onClick={handleOnCloseModal}
-                    >
-                      بستن
-                    </Button>
-                  </Stack>
-                </Stack>
-              </Box>
-            </Box>
-          </Fade>
-        </Modal>
-      )}
+      <Notification
+        open={isOpenNotification}
+        onClose={setStatus}
+        message={statusMsg}
+        isInfo={isPendingRequestDeletion}
+        isSuccess={isSuccessfulNotification}
+      />
     </Box>
-  )
-}
-
-function StyledHeadCell({children, ...props}) {
-  return (
-    <TableCell
-      sx={{
-        backgroundColor: theme => theme.palette.common.black,
-        color: theme => theme.palette.common.white,
-      }}
-      {...props}
-    >
-      {children}
-    </TableCell>
   )
 }
 
