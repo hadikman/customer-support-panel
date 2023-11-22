@@ -71,8 +71,8 @@ function SVG({
   return (
     <Box
       component="svg"
-      width={iconSize[size]}
-      height={iconSize[size]}
+      width={iconSize[size] ? iconSize[size] : size}
+      height={iconSize[size] ? iconSize[size] : size}
       sx={{
         fill: theme =>
           disabled
