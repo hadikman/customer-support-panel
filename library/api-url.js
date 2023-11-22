@@ -1,0 +1,7 @@
+export const AUTH_API_URL = '/api/auth'
+export const ADD_REGISTER_REQUEST_API_URL = '/api/addRegisterRequest'
+export const DELETE_REQUEST_API_URL = '/api/deleteRequest'
+export const GET_ALL_FORMS_API_URL = '/api/getAllForms'
+export const GET_FORM_API_URL = '/api/getForm'
+export const UPDATE_REQUEST_API_URL = '/api/updateRequest'
+export const GET_REQEUSTS_COUNT_API_URL = '/api/getRequestsCount'
