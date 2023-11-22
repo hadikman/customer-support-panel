@@ -21,6 +21,8 @@ const icons = {
   caretRight: 'caret-right',
   firstPage: 'arrow-right-to-line',
   lastPage: 'arrow-left-to-line',
+  letter: 'memo',
+  close: 'xmark',
 }
 
 export default icons
