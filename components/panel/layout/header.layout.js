@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Link from 'next/link'
 import {AuthContext} from 'components/panel/auth/auth'
-
+import useQueryData from 'hook/useQueryData'
 import {styled, alpha} from '@mui/material/styles'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -20,14 +20,20 @@ import MenuItem from '@mui/material/MenuItem'
 import Menu from '@mui/material/Menu'
 import Icon from 'components/UI/icon'
 import iconNames from 'library/icons-name'
+import {GET_REQEUSTS_COUNT_API_URL} from 'library/api-url'
 
-const {menu, home, search, inbox, logout, moreVer} = iconNames
+const {menu, home, letter, search, inbox, logout, moreVer} = iconNames
 
 const menuList = [
   {
     name: 'صفحه اصلی',
-    path: '/',
+    path: '/dash-cp',
     icon: home,
+  },
+  {
+    name: 'ثبت درخواست',
+    path: '/customer/register',
+    icon: letter,
   },
 ]
 
@@ -72,6 +78,10 @@ const StyledInputBase = styled(InputBase)(({theme}) => ({
 }))
 
 export default function Header() {
+  const {data, isSuccess} = useQueryData({
+    url: GET_REQEUSTS_COUNT_API_URL,
+    queryKey: ['requests-count'],
+  })
   const {onUpdateAuthState} = React.useContext(AuthContext)
   const [anchorEl, setAnchorEl] = React.useState(null)
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null)
@@ -168,7 +178,11 @@ export default function Header() {
       onClose={handleOnMobileMenuClose}
     >
       <MenuItem>
-        <Badge badgeContent={4} color="error" sx={{mr: 1}}>
+        <Badge
+          badgeContent={isSuccess ? data.data : '-'}
+          color="error"
+          sx={{mr: 1}}
+        >
           <Icon name={inbox} size="small" />
         </Badge>
         <Typography>درخواست‌ها</Typography>
