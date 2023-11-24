@@ -31,7 +31,7 @@ export default function CustomizedTextField({
       }
 
       if ((regex && (regex.test(value) || value === '')) || regexState) {
-        setInuptValue(value)
+        setInuptValue(convertFaToEnNumbers(value))
       } else {
         setInputErrorMessage(errorMessage)
       }
@@ -61,4 +61,15 @@ export default function CustomizedTextField({
       inputProps={{onBlur: handleOnBlur}}
     />
   )
+}
+
+function convertFaToEnNumbers(persianNumber) {
+  const persianDigits = '۰۱۲۳۴۵۶۷۸۹'
+  const englishDigits = '0123456789'
+
+  const digitMap = new Map(
+    [...persianDigits].map((d, i) => [d, englishDigits[i]]),
+  )
+
+  return persianNumber.replace(/[۰-۹]/g, match => digitMap.get(match))
 }

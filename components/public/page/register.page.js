@@ -207,7 +207,7 @@ function SupportRequestForm({onSubmittedForm, submittedFormData}) {
           label="شماره موبایل"
           placeholder="09387069917"
           required
-          regex={/^0[0-9]*$/}
+          regex={/^[۰0][۰-۹0-9]*$/}
           length="11"
           errorMessage="فقط اعداد مجاز است و شماره باید با صفر شروع شود"
           fullWidth
@@ -218,7 +218,7 @@ function SupportRequestForm({onSubmittedForm, submittedFormData}) {
           className="fix-height"
           label="شماره ثابت"
           placeholder="66743198"
-          regex={/^[0-9]*$/}
+          regex={/^[۰-۹0-9]*$/}
           length="8"
           errorMessage="فقط اعداد مجاز است و شماره باید بدون کد شهر وارد شود"
           fullWidth
