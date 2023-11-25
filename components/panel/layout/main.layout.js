@@ -5,7 +5,9 @@ export default function PanelMainLayout({children}) {
   return (
     <>
       <Header />
-      <Box component="main">{children}</Box>
+      <Box component="main" sx={{p: 2}}>
+        {children}
+      </Box>
     </>
   )
 }
