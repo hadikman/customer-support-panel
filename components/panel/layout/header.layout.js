@@ -1,4 +1,5 @@
 import * as React from 'react'
+import {useRouter} from 'next/router'
 import Link from 'next/link'
 import {AuthContext} from 'components/panel/auth/auth'
 import useQueryData from 'hook/useQueryData'
@@ -37,7 +38,7 @@ const menuList = [
   },
 ]
 
-const Search = styled('div')(({theme}) => ({
+const Search = styled('form')(({theme}) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
   backgroundColor: alpha(theme.palette.common.white, 0.15),
@@ -53,14 +54,14 @@ const Search = styled('div')(({theme}) => ({
   },
 }))
 
-const SearchIconWrapper = styled('div')(({theme}) => ({
+const SearchIconWrapper = styled(IconButton)(({theme}) => ({
   padding: theme.spacing(0, 2),
   height: '100%',
   position: 'absolute',
-  pointerEvents: 'none',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  zIndex: 1,
 }))
 
 const StyledInputBase = styled(InputBase)(({theme}) => ({
@@ -78,10 +79,12 @@ const StyledInputBase = styled(InputBase)(({theme}) => ({
 }))
 
 export default function Header() {
+  const router = useRouter()
   const {data, isSuccess} = useQueryData({
     url: GET_REQEUSTS_COUNT_API_URL,
     queryKey: ['requests-count'],
   })
+  const [searchString, setSearchString] = React.useState('')
   const {onUpdateAuthState} = React.useContext(AuthContext)
   const [anchorEl, setAnchorEl] = React.useState(null)
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null)
@@ -89,6 +92,19 @@ export default function Header() {
 
   const isMenuOpen = Boolean(anchorEl)
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
+
+  function handleOnChangeSearch(e) {
+    const value = e.target.value
+    setSearchString(value)
+  }
+
+  function handleOnSubmitSearchForm(e) {
+    e.preventDefault()
+
+    router.push({pathname: `/dash-cp/search-result`, query: {q: searchString}})
+
+    setSearchString('')
+  }
 
   function handleOnToggleDrawer(e) {
     if (e.type === 'keydown' && (e.key === 'Tab' || e.key === 'Shift')) {
@@ -124,7 +140,7 @@ export default function Header() {
       <List>
         {menuList.map(({name, path, icon}) => (
           <ListItem key={name} disablePadding>
-            <Link href={path}>
+            <Link href={path} style={{width: '100%'}}>
               <ListItemButton>
                 <ListItemIcon>
                   <Icon name={icon} size="small" />
@@ -143,14 +159,8 @@ export default function Header() {
       id="primary-header-menu"
       anchorEl={anchorEl}
       keepMounted
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
+      anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+      transformOrigin={{vertical: 'top', horizontal: 'right'}}
       open={isMenuOpen}
       onClose={handleOnMenuClose}
     >
@@ -166,14 +176,8 @@ export default function Header() {
       id="primary-header-menu-mobile"
       anchorEl={mobileMoreAnchorEl}
       keepMounted
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
+      anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+      transformOrigin={{vertical: 'top', horizontal: 'right'}}
       open={isMobileMenuOpen}
       onClose={handleOnMobileMenuClose}
     >
@@ -218,10 +222,15 @@ export default function Header() {
             کنترل پنل
           </Typography>
           <Search>
-            <SearchIconWrapper>
+            <SearchIconWrapper type="submit" onClick={handleOnSubmitSearchForm}>
               <Icon name={search} size="small" color="#fff" />
             </SearchIconWrapper>
-            <StyledInputBase placeholder="جستجو" />
+            <StyledInputBase
+              id="search-input"
+              placeholder="جستجو"
+              value={searchString}
+              onChange={handleOnChangeSearch}
+            />
           </Search>
           <Box sx={{flexGrow: 1}} />
           <Box sx={{display: {xs: 'none', md: 'flex'}}}>
