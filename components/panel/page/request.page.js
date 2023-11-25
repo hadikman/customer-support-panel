@@ -42,15 +42,14 @@ const aliasNames = {
 const todayData = utils('fa').getToday()
 
 export default function Request() {
-  const router = useRouter()
-  const {q} = router.query
-  const isQuery = q !== undefined
+  const {query, isReady} = useRouter()
+  const {q} = query
   const {
     data: requestData,
     isLoading,
     isSuccess,
   } = useQueryData({
-    enabled: isQuery,
+    enabled: isReady,
     queryKey: ['request-form', q],
     url: GET_FORM_API_URL,
     body: {requestId: q},
@@ -169,11 +168,10 @@ export default function Request() {
         sx={{
           backgroundColor: theme => theme.palette.common.white,
           color: theme => theme.palette.common.black,
-          p: 2,
         }}
       >
         {isLoading ? (
-          <Typography variant="body2">در حال بارگزاری...</Typography>
+          <Typography variant="body2">در حال بارگذاری...</Typography>
         ) : isSuccess && isReadyData ? (
           <Box>
             <TableContainer component={Paper} sx={{width: '100%', mb: 2}}>
@@ -325,7 +323,7 @@ export default function Request() {
             </Stack>
           </Box>
         ) : (
-          <Typography variant="body1" color="red">
+          <Typography variant="body1" color="success">
             نمایش درخواست...
           </Typography>
         )}
