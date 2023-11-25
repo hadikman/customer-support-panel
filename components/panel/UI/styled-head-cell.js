@@ -1,14 +1,13 @@
 import TableCell from '@mui/material/TableCell'
 
-export default function StyledHeadCell({children, sx, ...props}) {
+export default function StyledHeadCell({children, align, sx, ...props}) {
   return (
     <TableCell
-      align="center"
+      align={align}
       sx={{
         backgroundColor: theme => theme.palette.common.black,
         color: theme => theme.palette.common.white,
         py: 0.5,
-        px: 1,
         ...sx,
       }}
       {...props}
