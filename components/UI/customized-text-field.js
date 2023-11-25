@@ -4,6 +4,7 @@ import TextField from '@mui/material/TextField'
 export default function CustomizedTextField({
   id,
   className,
+  type,
   label,
   placeholder,
   helperText,
@@ -49,6 +50,7 @@ export default function CustomizedTextField({
     <TextField
       id={id}
       className={className}
+      type={type}
       label={label}
       placeholder={placeholder}
       value={inputValue}
@@ -59,6 +61,20 @@ export default function CustomizedTextField({
       autoFocus={autoFocus}
       onChange={handleOnChange}
       inputProps={{onBlur: handleOnBlur}}
+      sx={{
+        ...(type === 'number' && {
+          /* Chrome, Safari, Edge, Opera */
+          'input::-webkit-outer-spin-button, input::-webkit-inner-spin-button':
+            {
+              WebkitAppearance: 'none',
+              margin: 0,
+            },
+          /* Firefox */
+          'input[type=number]': {
+            MozAppearance: 'textfield',
+          },
+        }),
+      }}
     />
   )
 }
