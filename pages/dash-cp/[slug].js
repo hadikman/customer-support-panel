@@ -12,11 +12,3 @@ export default function RequestPage() {
     </>
   )
 }
-
-export async function getStaticPaths() {
-  return {paths: [], fallback: 'blocking'}
-}
-
-export async function getStaticProps() {
-  return {props: {}}
-}
