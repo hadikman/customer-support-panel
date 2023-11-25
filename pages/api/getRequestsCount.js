@@ -6,7 +6,7 @@ export default async function handler(req, res) {
 
     try {
       const db = client.db('panel')
-      let data = await db.collection('requests').countDocuments({seen: true})
+      let data = await db.collection('requests').countDocuments({seen: false})
 
       data = JSON.stringify({data})
 
