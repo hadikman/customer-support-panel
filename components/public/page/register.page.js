@@ -204,8 +204,9 @@ function SupportRequestForm({onSubmittedForm, submittedFormData}) {
         <CustomizedTextField
           id="mobile-number"
           className="fix-height"
+          type="number"
           label="شماره موبایل"
-          placeholder="09387069917"
+          placeholder="نمونه: 09387069917"
           required
           regex={/^[۰0][۰-۹0-9]*$/}
           length="11"
@@ -216,8 +217,9 @@ function SupportRequestForm({onSubmittedForm, submittedFormData}) {
         <CustomizedTextField
           id="phone-number"
           className="fix-height"
+          type="number"
           label="شماره ثابت"
-          placeholder="66743198"
+          placeholder="نمونه: 66743198"
           regex={/^[۰-۹0-9]*$/}
           length="8"
           errorMessage="فقط اعداد مجاز است و شماره باید بدون کد شهر وارد شود"
@@ -227,9 +229,9 @@ function SupportRequestForm({onSubmittedForm, submittedFormData}) {
         <TextField
           id="address"
           label="آدرس"
-          placeholder="فلکه اول صادقیه، خیابان ستارخان، کوچه گلناز دهم، پلاک 16، واحد 2"
+          placeholder="نمونه: فلکه اول صادقیه، خیابان ستارخان، کوچه گلناز دهم، پلاک 16، واحد 2"
           value={address}
-          helperText="رزرو"
+          helperText="آدرس دقیق پستی"
           multiline
           rows={2}
           fullWidth
