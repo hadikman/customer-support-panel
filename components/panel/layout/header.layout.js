@@ -2,6 +2,7 @@ import * as React from 'react'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
 import {AuthContext} from 'components/panel/auth/auth'
+import {useIsMutating} from '@tanstack/react-query'
 import useQueryData from 'hook/useQueryData'
 import {styled, alpha} from '@mui/material/styles'
 import AppBar from '@mui/material/AppBar'
@@ -19,6 +20,7 @@ import InputBase from '@mui/material/InputBase'
 import Badge from '@mui/material/Badge'
 import MenuItem from '@mui/material/MenuItem'
 import Menu from '@mui/material/Menu'
+import CircularProgress from '@mui/material/CircularProgress'
 import Icon from 'components/UI/icon'
 import iconNames from 'library/icons-name'
 import {GET_REQEUSTS_COUNT_API_URL} from 'library/api-url'
@@ -80,6 +82,7 @@ const StyledInputBase = styled(InputBase)(({theme}) => ({
 
 export default function Header() {
   const router = useRouter()
+  const isMutatingSearch = useIsMutating({mutationKey: ['search']})
   const {data, isSuccess} = useQueryData({
     url: GET_REQEUSTS_COUNT_API_URL,
     queryKey: ['requests-count'],
@@ -90,6 +93,7 @@ export default function Header() {
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null)
   const [toggleDrawer, setToggleDrawer] = React.useState(false)
 
+  const isSearching = Boolean(isMutatingSearch)
   const isMenuOpen = Boolean(anchorEl)
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
 
@@ -222,8 +226,16 @@ export default function Header() {
             کنترل پنل
           </Typography>
           <Search>
-            <SearchIconWrapper type="submit" onClick={handleOnSubmitSearchForm}>
-              <Icon name={search} size="small" color="#fff" />
+            <SearchIconWrapper
+              type="submit"
+              disabled={isSearching}
+              onClick={handleOnSubmitSearchForm}
+            >
+              {isSearching ? (
+                <CircularProgress size={15} sx={{color: 'white'}} />
+              ) : (
+                <Icon name={search} size="small" color="#fff" />
+              )}
             </SearchIconWrapper>
             <StyledInputBase
               id="search-input"
