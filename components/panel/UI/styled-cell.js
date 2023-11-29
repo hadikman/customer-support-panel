@@ -1,9 +1,10 @@
+import {styled} from '@mui/material/styles'
 import TableCell from '@mui/material/TableCell'
 
-export default function StyledCell({children, sx, ...props}) {
-  return (
-    <TableCell sx={{fontSize: 12, ...sx}} {...props}>
-      {children}
-    </TableCell>
-  )
-}
+const StyledCell = styled(TableCell)(() => ({
+  fontSize: 12,
+  paddingLeft: 8,
+  paddingRight: 8,
+}))
+
+export default StyledCell
