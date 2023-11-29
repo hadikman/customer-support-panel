@@ -182,6 +182,7 @@ export default function ReqeustsTable({data, isLoading, isSuccess}) {
           <SortableTableHead
             order={order}
             orderBy={orderBy}
+            isLoading={isLoading}
             onRequestSort={handleOnRequestSort}
           />
           {isLoading ? (
@@ -360,11 +361,7 @@ export default function ReqeustsTable({data, isLoading, isSuccess}) {
   )
 }
 
-function SortableTableHead({order, orderBy, onRequestSort}) {
-  const isFetchingAllForms = useIsFetching({queryKey: ['all-forms']})
-
-  const isLoadingAllForms = Boolean(isFetchingAllForms)
-
+function SortableTableHead({order, orderBy, onRequestSort, isLoading}) {
   function handleOnCreateSort(property) {
     return event => onRequestSort(event, property)
   }
@@ -389,8 +386,8 @@ function SortableTableHead({order, orderBy, onRequestSort}) {
       <TableRow
         sx={{
           bgcolor: theme => theme.palette.grey[400],
-          borderBottom: isLoadingAllForms ? '6px solid' : '3px solid',
-          borderColor: isLoadingAllForms ? 'warning.light' : 'success.light',
+          borderBottom: isLoading ? '6px solid' : '3px solid',
+          borderColor: isLoading ? 'warning.light' : 'success.light',
           transition: 'border 0.5s',
         }}
       >
