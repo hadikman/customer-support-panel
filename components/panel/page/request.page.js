@@ -23,6 +23,7 @@ import Divider from '@mui/material/Divider'
 import CircularProgress from '@mui/material/CircularProgress'
 import StyledHeadCell from 'components/panel/UI/styled-head-cell'
 import {GET_FORM_API_URL, UPDATE_REQUEST_API_URL} from 'library/api-url'
+import persianToCalendars from 'utility/persian-to-calendars'
 
 import '@hassanmojab/react-modern-calendar-datepicker/lib/DatePicker.css'
 
@@ -38,6 +39,7 @@ const aliasNames = {
   dateOfService: 'تاریخ بازدید',
   serviceState: 'وضعیت رسیدگی',
   registerDate: 'تاریخ ثبت',
+  lastUpdated: 'اخرین بروزرسانی',
 }
 const todayData = utils('fa').getToday()
 
@@ -94,13 +96,35 @@ export default function Request() {
       for (let [key, value] of Object.entries(requestData)) {
         const aliasName = aliasNames[key]
         const isMobileNumber = key === 'mobileNumber'
+        const isRegisterDate = key === 'registerDate'
+        const isDateOfService = key === 'dateOfService'
+        const isLastUpdated = key === 'lastUpdated'
         const isAliasName = aliasName
         const isValue = Boolean(value)
 
         if (isAliasName) {
           newFormat.push({
             title: aliasName,
-            content: isMobileNumber ? `0${value}` : isValue ? value : '—',
+            content: isMobileNumber
+              ? `0${value}`
+              : isRegisterDate || isLastUpdated
+              ? `${new Date(value).toLocaleTimeString('fa-IR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })} - ${new Date(value).toLocaleDateString('fa-IR', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                })}`
+              : isDateOfService && isValue
+              ? new Date(value).toLocaleDateString('fa-IR', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                })
+              : isValue
+              ? value
+              : '—',
           })
         }
       }
@@ -151,7 +175,11 @@ export default function Request() {
         ? examinationDesc.trim()
         : requestData.examinationDesc,
       dateOfService: selectedExaminationDate
-        ? `${selectedExaminationDate.year}/${selectedExaminationDate.month}/${selectedExaminationDate.day}`
+        ? persianToCalendars(
+            selectedExaminationDate.year,
+            selectedExaminationDate.month,
+            selectedExaminationDate.day,
+          )
         : requestData.dateOfService,
     }
 
@@ -316,7 +344,7 @@ export default function Request() {
                     'ثبت بازدید'
                   )}
                 </Button>
-                <Button variant="contained" color="error">
+                <Button variant="contained" color="warning">
                   <Link href="/dash-cp">صفحه قبل</Link>
                 </Button>
               </Stack>

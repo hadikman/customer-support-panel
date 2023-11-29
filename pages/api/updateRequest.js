@@ -27,11 +27,15 @@ export default async function handler(req, res) {
 
       formattedData[newKey] = value
     }
+
     try {
       const db = client.db('panel')
       await db
         .collection('requests')
-        .updateOne({_id: id}, {$set: formattedData})
+        .updateOne(
+          {_id: id},
+          {$set: formattedData, $currentDate: {lastUpdated: true}},
+        )
 
       client.close()
       res.status(200).send({message: 'successful', data: body})

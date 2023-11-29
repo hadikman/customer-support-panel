@@ -5,14 +5,7 @@ const aliasNameForDatabase = {
   phoneNumber: 'bas',
 }
 const extraProperties = {
-  registerDate: `${new Date().toLocaleTimeString('fa-IR', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })} - ${new Date().toLocaleDateString('fa-IR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })}`,
+  registerDate: new Date(),
   serviceState: null,
   descOfServicesPerformed: '',
   dateOfService: '',
