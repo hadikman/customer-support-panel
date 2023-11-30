@@ -1,3 +1,4 @@
+import Head from 'next/head'
 import MuiThemeProvider from 'utility/mui-theme-provider'
 import {CacheProvider} from '@emotion/react'
 import createCache from '@emotion/cache'
@@ -17,15 +18,22 @@ const queryClient = new QueryClient()
 
 export default function App({Component, pageProps}) {
   return (
-    <MuiThemeProvider>
-      <CacheProvider value={cacheRtl}>
-        <QueryClientProvider client={queryClient}>
-          <MainLayout>
-            <CssBaseline />
-            <Component {...pageProps} />
-          </MainLayout>
-        </QueryClientProvider>
-      </CacheProvider>
-    </MuiThemeProvider>
+    <>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <MuiThemeProvider>
+        <CacheProvider value={cacheRtl}>
+          <QueryClientProvider client={queryClient}>
+            <MainLayout>
+              <CssBaseline />
+              <Component {...pageProps} />
+            </MainLayout>
+          </QueryClientProvider>
+        </CacheProvider>
+      </MuiThemeProvider>
+    </>
   )
 }
