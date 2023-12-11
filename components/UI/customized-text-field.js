@@ -13,13 +13,34 @@ export default function CustomizedTextField({
   autoFocus,
   regex,
   length,
+  isError,
   errorMessage,
+  debounceDuration,
+  onBlur,
+  onFocus,
   onReturnValue,
+  sx,
 }) {
   const [inputValue, setInuptValue] = React.useState('')
   const [inputErrorMessage, setInputErrorMessage] = React.useState('')
 
   const isInputError = inputErrorMessage !== ''
+
+  React.useEffect(() => {
+    let timeout
+
+    if (debounceDuration) {
+      timeout = setTimeout(() => {
+        onReturnValue(inputValue)
+      }, debounceDuration)
+    }
+
+    return () => {
+      if (debounceDuration) {
+        clearTimeout(timeout)
+      }
+    }
+  }, [debounceDuration, inputValue, onReturnValue])
 
   function handleOnChange(e) {
     const value = e.target.value
@@ -39,10 +60,21 @@ export default function CustomizedTextField({
     }
   }
 
+  function handleOnFocus() {
+    if (onFocus) {
+      onFocus()
+    }
+  }
+
   function handleOnBlur() {
     if (isInputError && inputValue === '') {
       setInputErrorMessage('')
     }
+
+    if (onBlur) {
+      onBlur()
+    }
+
     onReturnValue(inputValue.trim())
   }
 
@@ -55,12 +87,12 @@ export default function CustomizedTextField({
       placeholder={placeholder}
       value={inputValue}
       helperText={inputErrorMessage || helperText}
-      error={isInputError}
+      error={isInputError || isError}
       fullWidth={fullWidth}
       required={required}
       autoFocus={autoFocus}
       onChange={handleOnChange}
-      inputProps={{onBlur: handleOnBlur}}
+      inputProps={{onFocus: handleOnFocus, onBlur: handleOnBlur}}
       sx={{
         ...(type === 'number' && {
           /* Chrome, Safari, Edge, Opera */
@@ -74,6 +106,7 @@ export default function CustomizedTextField({
             MozAppearance: 'textfield',
           },
         }),
+        ...sx,
       }}
     />
   )
