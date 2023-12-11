@@ -1,4 +1,5 @@
 import {createTheme, ThemeProvider} from '@mui/material/styles'
+import {teal} from '@mui/material/colors'
 import {faIR} from '@mui/material/locale'
 import VAZIRMATN_FONT from './share-font'
 
@@ -31,6 +32,17 @@ let theme = createTheme({
     },
   },
   faIR,
+})
+
+theme = createTheme(theme, {
+  palette: {
+    accent: theme.palette.augmentColor({
+      color: {
+        main: teal[500],
+      },
+      name: 'accent',
+    }),
+  },
 })
 
 export default function MuiThemeProvider({children, ...props}) {
