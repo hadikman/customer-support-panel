@@ -14,6 +14,7 @@ function Notification({
   isSuccess,
   message,
   autoHideDuration = 6000,
+  anchorOrigin = {vertical: '', horizontal: ''},
 }) {
   function handleOnCloseSnackbar(event, reason) {
     if (reason === 'clickaway') {
@@ -28,7 +29,7 @@ function Notification({
   return (
     <Snackbar
       open={open}
-      anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+      anchorOrigin={{vertical: 'bottom', horizontal: 'right', ...anchorOrigin}}
       onClose={handleOnCloseSnackbar}
       autoHideDuration={autoHideDuration}
       action={
