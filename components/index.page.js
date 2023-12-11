@@ -1,42 +1,51 @@
-import Head from 'next/head'
 import Link from 'next/link'
+import Grid from '@mui/material/Grid'
+import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
 
 export default function IndexPage() {
   return (
-    <>
-      <Head>
-        <title>پنل خدمات پشتیبانی</title>
-        <meta name="description" content="پنل خدمات پشتیبانی" />
-      </Head>
-
-      <Box sx={{pt: '25vh'}}>
-        <Box
-          sx={{
-            textAlign: 'center',
-            border: '2px solid',
-            borderColor: 'primary.main',
-            borderRadius: 2,
-            py: 10,
-            px: 2,
-          }}
-        >
-          <Box sx={{mb: 6}}>
-            <Typography variant="h5" sx={{fontWeight: 'bold', mb: 3}}>
-              پنل خدمات پشتیبانی
-            </Typography>
-            <Typography>
-              جهت دریافت خدمات پشتیبانی کولرگازی، درخواست خود را ثبت نمایید.
-            </Typography>
-          </Box>
+    <Grid container sx={{height: '100vh', alignContent: 'center'}}>
+      <Stack
+        sx={{
+          gap: 6,
+          textAlign: 'center',
+          bgcolor: theme => theme.palette.grey[100],
+          border: '2px solid',
+          borderColor: 'primary.main',
+          borderRadius: 2,
+          py: 6,
+          px: 2,
+        }}
+      >
+        <Typography variant="h5" sx={{fontWeight: 'bold', mb: 3}}>
+          پنل خدمات پشتیبانی
+        </Typography>
+        <Box>
+          <Typography sx={{mb: 2}}>
+            جهت دریافت خدمات پشتیبانی کولرگازی، درخواست خود را ثبت نمایید.
+          </Typography>
 
           <Button variant="contained">
-            <Link href="/customer/register">درخواست پشتیبانی</Link>
+            <Link href="/customer/register">ثبت درخواست</Link>
           </Button>
         </Box>
-      </Box>
-    </>
+
+        <Divider />
+
+        <Box>
+          <Typography sx={{mb: 2}}>
+            جهت بهبود کیفیت خدمات ارائه شده، می توانید در نظرسنجی شرکت نمایید.
+          </Typography>
+
+          <Button variant="contained">
+            <Link href="/customer/survey">ثبت نظرسنجی</Link>
+          </Button>
+        </Box>
+      </Stack>
+    </Grid>
   )
 }

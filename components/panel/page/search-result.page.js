@@ -4,10 +4,10 @@ import {useQueryClient} from '@tanstack/react-query'
 import useMutateData from 'hook/useMutateData'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
-import ReqeustsTable from '../UI/requests-table'
+import ReqeustsTable from 'components/panel/UI/requests-table'
 import {QUERY_ALL_FORMS_FIELD_API_URL} from 'library/api-url'
-import {Typography} from '@mui/material'
 
 export default function SearchResultPage() {
   const {query, isReady, back} = useRouter()
