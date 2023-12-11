@@ -25,7 +25,7 @@ import Icon from 'components/UI/icon'
 import iconNames from 'library/icons-name'
 import {GET_REQEUSTS_COUNT_API_URL} from 'library/api-url'
 
-const {menu, home, letter, search, inbox, logout, moreVer} = iconNames
+const {menu, home, letter, poll, search, inbox, logout, moreVer} = iconNames
 
 const menuList = [
   {
@@ -37,6 +37,16 @@ const menuList = [
     name: 'ثبت درخواست',
     path: '/customer/register',
     icon: letter,
+  },
+  {
+    name: 'ثبت نظرسنجی',
+    path: '/customer/survey',
+    icon: letter,
+  },
+  {
+    name: 'مشاهده نظرسنجی',
+    path: '/dash-cp/survey',
+    icon: poll,
   },
 ]
 

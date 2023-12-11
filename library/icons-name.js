@@ -23,6 +23,7 @@ const icons = {
   lastPage: 'arrow-left-to-line',
   letter: 'memo',
   close: 'xmark',
+  poll: 'square-poll-horizontal',
 }
 
 export default icons
