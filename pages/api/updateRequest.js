@@ -13,6 +13,12 @@ export default async function handler(req, res) {
     const id = new ObjectId(body.requestId)
 
     let formattedData = {}
+    let lastUpdatedObj = true
+
+    const isSeenUpdateQuery =
+      Object.keys(body).length === 2 && 'requestId' in body && 'seen' in body
+
+    lastUpdatedObj = isSeenUpdateQuery ? {} : {lastUpdated: true}
 
     for (const key in body) {
       let value = body[key]
@@ -34,7 +40,7 @@ export default async function handler(req, res) {
         .collection('requests')
         .updateOne(
           {_id: id},
-          {$set: formattedData, $currentDate: {lastUpdated: true}},
+          {$set: formattedData, $currentDate: lastUpdatedObj},
         )
 
       client.close()
