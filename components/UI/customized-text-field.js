@@ -4,6 +4,7 @@ import TextField from '@mui/material/TextField'
 export default function CustomizedTextField({
   id,
   className,
+  name,
   type,
   label,
   placeholder,
@@ -13,6 +14,8 @@ export default function CustomizedTextField({
   autoFocus,
   regex,
   length,
+  multiline,
+  rows,
   isError,
   errorMessage,
   debounceDuration,
@@ -60,19 +63,19 @@ export default function CustomizedTextField({
     }
   }
 
-  function handleOnFocus() {
+  function handleOnFocus(e) {
     if (onFocus) {
-      onFocus()
+      onFocus(e)
     }
   }
 
-  function handleOnBlur() {
+  function handleOnBlur(e) {
     if (isInputError && inputValue === '') {
       setInputErrorMessage('')
     }
 
     if (onBlur) {
-      onBlur()
+      onBlur(e)
     }
 
     onReturnValue(inputValue.trim())
@@ -82,6 +85,7 @@ export default function CustomizedTextField({
     <TextField
       id={id}
       className={className}
+      name={name}
       type={type}
       label={label}
       placeholder={placeholder}
@@ -91,6 +95,8 @@ export default function CustomizedTextField({
       fullWidth={fullWidth}
       required={required}
       autoFocus={autoFocus}
+      multiline={multiline}
+      rows={rows}
       onChange={handleOnChange}
       inputProps={{onFocus: handleOnFocus, onBlur: handleOnBlur}}
       sx={{
