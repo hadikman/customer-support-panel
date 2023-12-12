@@ -229,7 +229,7 @@ function SupportRequestForm({onSubmittedForm, onSubmittedFormData}) {
           type="number"
           label="شماره ثابت"
           placeholder="نمونه: 66743198"
-          regex={/^[۰-۹0-9]*$/}
+          regex={/^[^۰0].*/}
           length="8"
           errorMessage="شماره باید بدون کد شهر وارد شود"
           fullWidth
