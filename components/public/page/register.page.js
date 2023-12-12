@@ -176,16 +176,6 @@ function SupportRequestForm({onSubmittedForm, onSubmittedFormData}) {
           '.fix-height': {
             minHeight: 80,
           },
-          /* Chrome, Safari, Edge, Opera */
-          'input::-webkit-outer-spin-button, input::-webkit-inner-spin-button':
-            {
-              WebkitAppearance: 'none',
-              margin: 0,
-            },
-          /* Firefox */
-          'input[type=number]': {
-            MozAppearance: 'textfield',
-          },
         }}
         onSubmit={handleOnSubmitForm}
       >
@@ -221,7 +211,6 @@ function SupportRequestForm({onSubmittedForm, onSubmittedFormData}) {
             setFormInputs(prevState => ({...prevState, mobileNumber: value}))
           }
         />
-
         <CustomizedTextField
           id="phone-number"
           className="fix-height"
