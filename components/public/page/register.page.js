@@ -4,7 +4,6 @@ import useMutateData from 'hook/useMutateData'
 import {useTheme} from '@mui/material/styles'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
-import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
@@ -58,7 +57,7 @@ export default function RegisterPage() {
       ) : (
         <SupportRequestForm
           onSubmittedForm={setIsRegisteredForm}
-          submittedFormData={setSubmittedFormData}
+          onSubmittedFormData={setSubmittedFormData}
         />
       )}
     </Box>
@@ -94,7 +93,7 @@ function getStyles(name, personName, theme) {
   }
 }
 
-function SupportRequestForm({onSubmittedForm, submittedFormData}) {
+function SupportRequestForm({onSubmittedForm, onSubmittedFormData}) {
   const {
     mutate: mutateToAddRequest,
     data,
@@ -104,45 +103,37 @@ function SupportRequestForm({onSubmittedForm, submittedFormData}) {
     url: ADD_REGISTER_REQUEST_API_URL,
   })
   const theme = useTheme()
-
-  const [name, setName] = React.useState('')
-  const [mobileNumber, setMobileNumber] = React.useState('')
-  const [phoneNumber, setPhoneNumber] = React.useState('')
-  const [address, setAddress] = React.useState('')
-  const [selectServices, setSelectServices] = React.useState([])
-  const [description, setDescription] = React.useState('')
+  const [formInputs, setFormInputs] = React.useState({
+    name: '',
+    mobileNumber: '',
+    phoneNumber: '',
+    address: '',
+    services: [],
+    description: '',
+  })
 
   React.useEffect(() => {
     if (isSuccess) {
-      submittedFormData(data.data)
+      onSubmittedFormData(data.data)
       onSubmittedForm(true)
     }
-  }, [data, isSuccess, onSubmittedForm, submittedFormData])
+  }, [data, isSuccess, onSubmittedForm, onSubmittedFormData])
 
-  function handleOnChangeAddress(e) {
-    setAddress(e.target.value)
-  }
-
-  function handleOnChangeSelectServices(e) {
-    const value = e.target.value
-
-    setSelectServices(typeof value === 'string' ? value.split(',') : value)
-  }
-
-  function handleOnChangeDescription(e) {
-    setDescription(e.target.value)
+  function handleOnChangeFormInputs(e) {
+    const {name, value} = e.target
+    setFormInputs(prevState => ({
+      ...prevState,
+      [name]: value,
+    }))
   }
 
   function handleOnSubmitForm(e) {
     e.preventDefault()
 
     const formData = {
-      name: name,
-      mobileNumber: +mobileNumber,
-      phoneNumber: +phoneNumber,
-      address: address.trim(),
-      selectServices,
-      description: description.trim(),
+      ...formInputs,
+      mobileNumber: +formInputs.mobileNumber,
+      phoneNumber: +formInputs.phoneNumber,
     }
 
     mutateToAddRequest(formData)
@@ -185,12 +176,23 @@ function SupportRequestForm({onSubmittedForm, submittedFormData}) {
           '.fix-height': {
             minHeight: 80,
           },
+          /* Chrome, Safari, Edge, Opera */
+          'input::-webkit-outer-spin-button, input::-webkit-inner-spin-button':
+            {
+              WebkitAppearance: 'none',
+              margin: 0,
+            },
+          /* Firefox */
+          'input[type=number]': {
+            MozAppearance: 'textfield',
+          },
         }}
         onSubmit={handleOnSubmitForm}
       >
         <CustomizedTextField
           id="name"
           className="fix-height"
+          name="name"
           label="نام خانوادگی"
           placeholder="آقای/خانم رضایی"
           errorMessage="فقط حروف فارسی/انگلیسی مجاز است."
@@ -199,55 +201,67 @@ function SupportRequestForm({onSubmittedForm, submittedFormData}) {
           autoFocus
           regex={/^[a-zA-Z\u0600-\u06FF\s]+$/}
           length="35"
-          onReturnValue={setName}
+          onReturnValue={value =>
+            setFormInputs(prevState => ({...prevState, name: value}))
+          }
         />
         <CustomizedTextField
           id="mobile-number"
           className="fix-height"
+          name="mobileNumber"
           type="number"
           label="شماره موبایل"
           placeholder="نمونه: 09387069917"
           required
-          regex={/^[۰0][۰-۹0-9]*$/}
+          regex={/^[۰0].*$/}
           length="11"
-          errorMessage="فقط اعداد مجاز است و شماره باید با صفر شروع شود"
+          errorMessage="شماره باید با صفر شروع شود"
           fullWidth
-          onReturnValue={setMobileNumber}
+          onReturnValue={value =>
+            setFormInputs(prevState => ({...prevState, mobileNumber: value}))
+          }
         />
+
         <CustomizedTextField
           id="phone-number"
           className="fix-height"
+          name="phoneNumber"
           type="number"
           label="شماره ثابت"
           placeholder="نمونه: 66743198"
           regex={/^[۰-۹0-9]*$/}
           length="8"
-          errorMessage="فقط اعداد مجاز است و شماره باید بدون کد شهر وارد شود"
+          errorMessage="شماره باید بدون کد شهر وارد شود"
           fullWidth
-          onReturnValue={setPhoneNumber}
+          onReturnValue={value =>
+            setFormInputs(prevState => ({...prevState, phoneNumber: value}))
+          }
         />
-        <TextField
+        <CustomizedTextField
           id="address"
+          name="address"
           label="آدرس"
           placeholder="نمونه: فلکه اول صادقیه، خیابان ستارخان، کوچه گلناز دهم، پلاک 16، واحد 2"
-          value={address}
           helperText="آدرس دقیق پستی"
           multiline
           rows={2}
           fullWidth
           required
-          onChange={handleOnChangeAddress}
+          onReturnValue={value =>
+            setFormInputs(prevState => ({...prevState, address: value}))
+          }
         />
         <FormControl fullWidth required className="fix-height">
           <InputLabel id="choose-services-label">خدمات</InputLabel>
           <Select
             labelId="choose-services-label"
             id="choose-services"
+            name="services"
             multiple
-            value={selectServices}
-            onChange={handleOnChangeSelectServices}
+            value={formInputs.services}
+            onChange={handleOnChangeFormInputs}
             input={
-              <OutlinedInput id="select-multiple-service" label="service" />
+              <OutlinedInput id="select-multiple-service" label="services" />
             }
             renderValue={selected => (
               <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
@@ -262,7 +276,7 @@ function SupportRequestForm({onSubmittedForm, submittedFormData}) {
               <MenuItem
                 key={name}
                 value={name}
-                style={getStyles(name, selectServices, theme)}
+                style={getStyles(name, formInputs.services, theme)}
               >
                 {name}
               </MenuItem>
@@ -270,15 +284,17 @@ function SupportRequestForm({onSubmittedForm, submittedFormData}) {
           </Select>
           <FormHelperText>بیش از یک گزینه می‌توانید انتخاب کنید</FormHelperText>
         </FormControl>
-        <TextField
+        <CustomizedTextField
           id="description"
+          name="description"
           label="توضیحات"
           placeholder="در صورت نیاز جهت راهنمایی بیشتر بابت خدمات درخواستی، توضیحات لازم را ارائه نمایید..."
-          value={description}
           multiline
           rows={6}
           fullWidth
-          onChange={handleOnChangeDescription}
+          onReturnValue={value =>
+            setFormInputs(prevState => ({...prevState, description: value}))
+          }
         />
 
         <Button
