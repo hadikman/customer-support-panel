@@ -6,7 +6,7 @@ const aliasNameForDatabase = {
 }
 const extraProperties = {
   registerDate: new Date(),
-  serviceState: null,
+  serviceState: 0,
   descOfServicesPerformed: '',
   dateOfService: '',
   seen: false,

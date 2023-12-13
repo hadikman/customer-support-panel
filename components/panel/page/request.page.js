@@ -23,6 +23,7 @@ import Divider from '@mui/material/Divider'
 import CircularProgress from '@mui/material/CircularProgress'
 import StyledHeadCell from 'components/panel/UI/styled-head-cell'
 import {GET_FORM_API_URL, UPDATE_REQUEST_API_URL} from 'library/api-url'
+import generatePersianTime from 'utility/generate-persian-time'
 import persianToCalendars from 'utility/persian-to-calendars'
 
 import '@hassanmojab/react-modern-calendar-datepicker/lib/DatePicker.css'
@@ -72,8 +73,8 @@ export default function Request() {
     React.useState('')
 
   const isReadyData = formattedRequestData.length > 0
-  const isServiceInProgress = serviceState === 'در حال رسیدگی'
-  const isCompletedService = serviceState === 'انجام شده'
+  const isServiceInProgress = serviceState === 1
+  const isCompletedService = serviceState === 2
   const isEmptyService = !isServiceInProgress && !isCompletedService
   const isEmptyExaminationDesc = examinationDesc === ''
   const isEmptySelectedExaminationDate = selectedExaminationDate === ''
@@ -96,6 +97,7 @@ export default function Request() {
       for (let [key, value] of Object.entries(requestData)) {
         const aliasName = aliasNames[key]
         const isMobileNumber = key === 'mobileNumber'
+        const isServiceState = key === 'serviceState'
         const isRegisterDate = key === 'registerDate'
         const isDateOfService = key === 'dateOfService'
         const isLastUpdated = key === 'lastUpdated'
@@ -107,21 +109,16 @@ export default function Request() {
             title: aliasName,
             content: isMobileNumber
               ? `0${value}`
+              : isServiceState
+              ? value === 1
+                ? 'در حال رسیدگی'
+                : value === 2
+                ? 'انجام شده'
+                : '—'
               : isRegisterDate || isLastUpdated
-              ? `${new Date(value).toLocaleTimeString('fa-IR', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })} - ${new Date(value).toLocaleDateString('fa-IR', {
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                })}`
+              ? `${generatePersianTime(value, true)}`
               : isDateOfService && isValue
-              ? new Date(value).toLocaleDateString('fa-IR', {
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                })
+              ? generatePersianTime(value)
               : isValue
               ? value
               : '—',
@@ -154,7 +151,7 @@ export default function Request() {
   }, [isUpdatedRequest])
 
   function handleOnServiceState(state) {
-    setServiceState(prevState => (state === prevState ? '' : state))
+    setServiceState(prevState => (state === prevState ? 0 : state))
   }
 
   function handleOnChangeDescription(e) {
@@ -262,14 +259,14 @@ export default function Request() {
                 <Button
                   variant={isServiceInProgress ? 'contained' : 'outlined'}
                   color="warning"
-                  onClick={() => handleOnServiceState('در حال رسیدگی')}
+                  onClick={() => handleOnServiceState(1)}
                 >
                   در حال رسیدگی
                 </Button>
                 <Button
                   variant={isCompletedService ? 'contained' : 'outlined'}
                   color="success"
-                  onClick={() => handleOnServiceState('انجام شده')}
+                  onClick={() => handleOnServiceState(2)}
                 >
                   انجام شده
                 </Button>

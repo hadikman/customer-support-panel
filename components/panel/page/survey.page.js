@@ -6,6 +6,7 @@ import Autocomplete from '@mui/material/Autocomplete'
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import {GET_SURVEY_API_URL} from 'library/api-url'
+import generatePersianTime from 'utility/generate-persian-time'
 
 const RATES = {
   A: '',
@@ -29,7 +30,7 @@ export default function SurveyPage() {
   if (isSuccess) {
     data.forEach(surveyData => {
       const {surveyResult, registerDate} = surveyData
-      const date = generatePersianDate(registerDate)
+      const date = generatePersianTime(registerDate)
 
       let foundDate = formattedSurveyData.find(item => item.date === date)
 
@@ -105,7 +106,7 @@ export default function SurveyPage() {
 
   React.useEffect(() => {
     if (isSuccess) {
-      setSelectDate(generatePersianDate(data[0].registerDate))
+      setSelectDate(generatePersianTime(data[0].registerDate))
     }
   }, [isSuccess, data])
 
@@ -202,12 +203,4 @@ export default function SurveyPage() {
       ) : null}
     </Box>
   )
-}
-
-function generatePersianDate(date) {
-  return new Date(date).toLocaleDateString('fa-IR', {
-    year: '2-digit',
-    month: '2-digit',
-    day: '2-digit',
-  })
 }

@@ -21,6 +21,7 @@ import StyledCell from 'components/panel/UI/styled-cell'
 import Notification from 'components/UI/notification'
 import icons from 'library/icons-name'
 import {DELETE_REQUEST_API_URL, UPDATE_REQUEST_API_URL} from 'library/api-url'
+import generatePersianTime from 'utility/generate-persian-time'
 
 const DISPLAY_ROWS = 8
 const ROW_HEIGHT = 60.8
@@ -48,7 +49,7 @@ const headCells = [
   {
     id: 'registerDate',
     disablePadding: false,
-    label: 'تاریخ ثبت',
+    label: 'تاریخ',
   },
   {
     id: 'serviceState',
@@ -241,11 +242,7 @@ export default function ReqeustsTable({data, isLoading, isSuccess}) {
                         {name}
                       </StyledCell>
                       <StyledCell align="left">
-                        {new Date(registerDate).toLocaleDateString('fa-IR', {
-                          year: '2-digit',
-                          month: '2-digit',
-                          day: '2-digit',
-                        })}
+                        {generatePersianTime(registerDate)}
                       </StyledCell>
                       <StyledCell>
                         <Grid
@@ -256,13 +253,13 @@ export default function ReqeustsTable({data, isLoading, isSuccess}) {
                             gap: 0.5,
                           }}
                         >
-                          {serviceState === 'در حال رسیدگی' ? (
+                          {serviceState === 1 ? (
                             <Icon
                               name={progress}
                               color="warning"
                               size="small"
                             />
-                          ) : serviceState === 'انجام شده' ? (
+                          ) : serviceState === 2 ? (
                             <Icon
                               name={completion}
                               color="success"
@@ -397,7 +394,7 @@ function SortableTableHead({order, orderBy, onRequestSort, isLoading}) {
             padding={disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === id ? order : false}
             sx={{
-              ...(id === 'name' && {minWidth: 140}),
+              ...(id === 'name' && {minWidth: 90}),
               py: 1,
               ...(!disablePadding && {px: 1}),
             }}
