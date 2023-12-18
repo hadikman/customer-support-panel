@@ -1,3 +1,4 @@
+import {useRouter} from 'next/router'
 import {createTheme, ThemeProvider} from '@mui/material/styles'
 import {teal} from '@mui/material/colors'
 import {faIR} from '@mui/material/locale'
@@ -9,13 +10,6 @@ let theme = createTheme({
     fontFamily: VAZIRMATN_FONT.style.fontFamily,
   },
   components: {
-    MuiCssBaseline: {
-      styleOverrides: theme => ({
-        body: {
-          backgroundColor: theme.palette.grey[700],
-        },
-      }),
-    },
     MuiModal: {
       styleOverrides: {
         root: {
@@ -46,6 +40,23 @@ theme = createTheme(theme, {
 })
 
 export default function MuiThemeProvider({children, ...props}) {
+  const {route} = useRouter()
+  const isPrint = route.startsWith('/dash-cp/print')
+
+  theme = createTheme(theme, {
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: theme => ({
+          body: {
+            backgroundColor: isPrint
+              ? theme.palette.background.paper
+              : theme.palette.grey[700],
+          },
+        }),
+      },
+    },
+  })
+
   return (
     <ThemeProvider theme={theme} {...props}>
       {children}

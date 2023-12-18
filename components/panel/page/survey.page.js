@@ -1,10 +1,13 @@
 import * as React from 'react'
+import {useRouter} from 'next/router'
+import {useQueryClient} from '@tanstack/react-query'
 import useQueryData from 'hook/useQueryData'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Autocomplete from '@mui/material/Autocomplete'
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
 import {GET_SURVEY_API_URL} from 'library/api-url'
 import generatePersianTime from 'utility/generate-persian-time'
 
@@ -17,6 +20,8 @@ const RATES = {
 }
 
 export default function SurveyPage() {
+  const {push} = useRouter()
+  const queryClient = useQueryClient()
   const {data, isLoading, isSuccess} = useQueryData({
     queryKey: ['survey'],
     url: GET_SURVEY_API_URL,
@@ -26,6 +31,7 @@ export default function SurveyPage() {
 
   const formattedSurveyData = []
   let surveyDates = []
+  let selectedDateSurveys = []
 
   if (isSuccess) {
     data.forEach(surveyData => {
@@ -100,6 +106,22 @@ export default function SurveyPage() {
 
     surveyDates = formattedSurveyData.map(({date}) => date)
   }
+
+  if (selectDate) {
+    data.forEach(surveyData => {
+      const {registerDate} = surveyData
+      const date = generatePersianTime(registerDate)
+
+      if (selectDate === date) {
+        selectedDateSurveys.push(surveyData)
+      }
+    })
+  }
+
+  if (selectedDateSurveys.length > 0) {
+    queryClient.setQueryData(['print-surveys'], selectedDateSurveys)
+  }
+
   const maxCountRefDividedByTen = Math.floor((maxCountRef.current - 1) / 10)
   const ceilOfMaxCount = maxCountRefDividedByTen * 10 + 10 // 4 => 10, 13 => 20, 28 => 30, ...
   const fullBarLength = 100 / ceilOfMaxCount
@@ -114,22 +136,43 @@ export default function SurveyPage() {
     setSelectDate(selectedDate)
   }
 
+  function handleOnPrint() {
+    push('/dash-cp/print')
+  }
+
   return (
     <Box>
       {isLoading ? (
         'در حال بارگذاری نظرسنجی...'
       ) : isSuccess ? (
         <Box>
-          <Autocomplete
-            options={surveyDates}
-            isOptionEqualToValue={option => option}
-            value={selectDate}
-            onChange={handleOnChangeDate}
-            sx={{width: 200, mb: 4}}
-            renderInput={params => (
-              <TextField {...params} label="انتخاب تاریخ" variant="standard" />
-            )}
-          />
+          <Grid
+            container
+            sx={{
+              alignItems: 'flex-end',
+              justifyContent: 'space-between',
+              mb: 4,
+            }}
+          >
+            <Autocomplete
+              options={surveyDates}
+              isOptionEqualToValue={option => option}
+              value={selectDate}
+              onChange={handleOnChangeDate}
+              sx={{width: 200}}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="انتخاب تاریخ"
+                  variant="standard"
+                />
+              )}
+            />
+
+            <Button variant="contained" onClick={handleOnPrint}>
+              چاپ
+            </Button>
+          </Grid>
 
           <Box>
             {formattedSurveyData.map(({date, surveys}) => (
@@ -152,19 +195,14 @@ export default function SurveyPage() {
 
                         {answers.map(({value, rate, count}) => (
                           <Grid key={rate} container sx={{gap: 1}}>
-                            <Grid item xs="auto" sx={{width: 85}}>
+                            <Grid item sx={{width: 85}}>
                               {value}
                             </Grid>
-                            <Grid
-                              item
-                              xs="auto"
-                              sx={{width: 12, textAlign: 'center'}}
-                            >
+                            <Grid item sx={{width: 12, textAlign: 'center'}}>
                               {rate}
                             </Grid>
                             <Grid
                               item
-                              xs="auto"
                               sx={{
                                 width:
                                   maxCountRef.current < 10
