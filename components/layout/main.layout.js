@@ -14,6 +14,7 @@ export default function MainLayout({children}) {
 
   const isPanel = route.startsWith('/dash-cp')
   const isPublic = route.startsWith('/customer')
+  const isPrint = route.startsWith('/dash-cp/print')
 
   React.useEffect(() => {
     setMountAppToLoadLocalFont(true)
@@ -28,9 +29,9 @@ export default function MainLayout({children}) {
       component="section"
       className={VAZIRMATN_FONT.className}
       sx={{
-        width: 'var(--mobile-width)',
+        width: isPrint ? 'var(--print-width)' : 'var(--mobile-width)',
         maxWidth: 'var(--max-width)',
-        minHeight: '100dvh',
+        minHeight: '100svh',
         bgcolor: theme => theme.palette.background.default,
         mx: 'auto',
       }}
