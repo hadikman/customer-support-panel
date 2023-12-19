@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
@@ -8,7 +7,7 @@ import Divider from '@mui/material/Divider'
 
 export default function CustomerPage() {
   return (
-    <Grid container sx={{height: '95vh', alignContent: 'center'}}>
+    <Box>
       <Stack
         sx={{
           gap: 6,
@@ -46,6 +45,6 @@ export default function CustomerPage() {
           </Button>
         </Box>
       </Stack>
-    </Grid>
+    </Box>
   )
 }

@@ -147,6 +147,7 @@ export default function Header() {
 
   function handleOnLogout() {
     onUpdateAuthState(false)
+    localStorage.removeItem('customer-support-panel-token')
   }
 
   const renderMeunList = (

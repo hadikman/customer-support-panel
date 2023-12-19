@@ -1,4 +1,5 @@
 import * as React from 'react'
+import Head from 'next/head'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 import Tabs from '@mui/material/Tabs'
@@ -28,23 +29,29 @@ export default function Authentication({children, ...props}) {
   const value = {isAuth: isAuthenticated, onUpdateAuthState: setIsAuthenticated}
 
   return (
-    <AuthContext.Provider value={value}>
-      {isLoadingPanel ? (
-        <Box
-          sx={{
-            height: '100svh',
-            display: 'grid',
-            placeContent: 'center',
-          }}
-        >
-          <CircularProgress size={60} />
-        </Box>
-      ) : isAuthenticated ? (
-        <>{children}</>
-      ) : (
-        <AuthenticationPage {...props} />
-      )}
-    </AuthContext.Provider>
+    <>
+      <Head>
+        <title>ورود به پنل مدیریت</title>
+      </Head>
+
+      <AuthContext.Provider value={value}>
+        {isLoadingPanel ? (
+          <Box
+            sx={{
+              height: '100svh',
+              display: 'grid',
+              placeContent: 'center',
+            }}
+          >
+            <CircularProgress size={60} />
+          </Box>
+        ) : isAuthenticated ? (
+          <>{children}</>
+        ) : (
+          <AuthenticationPage {...props} />
+        )}
+      </AuthContext.Provider>
+    </>
   )
 }
 
