@@ -8,7 +8,7 @@ import Divider from '@mui/material/Divider'
 
 export default function IndexPage() {
   return (
-    <Grid container sx={{height: '100vh', alignContent: 'center'}}>
+    <Grid container sx={{height: '95vh', alignContent: 'center'}}>
       <Stack
         sx={{
           gap: 6,
