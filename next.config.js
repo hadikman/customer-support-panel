@@ -14,7 +14,11 @@ const nextConfig = {
   },
 }
 
-const plugins = []
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
+const plugins = [withBundleAnalyzer]
 
 module.exports = (phase, {defaultConfig}) => {
   return plugins.reduce((acc, plugin) => plugin(acc), {...nextConfig})
